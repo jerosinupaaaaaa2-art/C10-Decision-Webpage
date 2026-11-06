@@ -158,12 +158,12 @@ function renderStages(){
  $("stageControls").querySelectorAll("[data-stage-criterion]").forEach(el=>el.onchange=()=>{stages[+el.dataset.stageCriterion].criterion=el.value;renderStages()});
  $("stageControls").querySelectorAll("[data-stage-keep]").forEach(el=>el.onchange=()=>{stages[+el.dataset.stageKeep].keep=Math.max(1,Math.min(data.alts.length,parseInt(el.value)||1));renderStages()});
  $("stageControls").querySelectorAll("[data-remove-stage]").forEach(el=>el.onclick=()=>{stages.splice(+el.dataset.removeStage,1);renderStages()});
- let survivors=all.slice(),cards=[{title:"Starting alternatives",list:survivors.map(x=>x.name),note:"Complete original set"}],logs=[];
+ let survivors=all.slice(),cards=[{title:"Starting alternatives",list:survivors.map(x=>x.name),note:"Complete original set"}],logs=[],errorMessage=null;
  for(let i=0;i<stages.length;i++){
   const st=stages[i],c=criteria[st.criterion];
-  if(!data.alts.every(a=>a.v.every(v=>Number.isFinite(Number(v))))){logs.push("Enter a valid numeric payoff in every cell before applying filters.");break}
-  if(st.criterion==="emv"&&!(data.states.every(x=>Number.isFinite(Number(x.p))&&Number(x.p)>=0)&&Math.abs(data.states.reduce((s,x)=>s+Number(x.p),0)-100)<1e-7)){logs.push("EMV stage needs non-negative probabilities totalling 100%.");break}
-  if(!survivors.length){logs.push("No alternatives remain to evaluate.");break}
+  if(!data.alts.every(a=>a.v.every(v=>Number.isFinite(Number(v))))){errorMessage="Enter a valid numeric payoff in every cell before applying filters.";break}
+  if(st.criterion==="emv"&&!(data.states.every(x=>Number.isFinite(Number(x.p))&&Number(x.p)>=0)&&Math.abs(data.states.reduce((s,x)=>s+Number(x.p),0)-100)<1e-7)){errorMessage="EMV stage needs non-negative probabilities totalling 100%.";break}
+  if(!survivors.length){errorMessage="No alternatives remain to evaluate.";break}
   const sorted=survivors.slice().sort((a,b)=>c.mode==="min"?a[c.key]-b[c.key]:b[c.key]-a[c.key]);
   const cutoffIndex=Math.min(Math.max(1,Number(st.keep)||1),sorted.length)-1,cutoff=sorted[cutoffIndex][c.key];
   const kept=survivors.filter(x=>c.mode==="min"?x[c.key]<=cutoff+TOL:x[c.key]>=cutoff-TOL);
@@ -171,10 +171,11 @@ function renderStages(){
   logs.push({label:c.label,cutoff,kept,removed,before:survivors.slice()});
   survivors=kept;cards.push({title:`After stage ${i+1}: ${c.label}`,list:survivors.map(x=>x.name),note:`Kept top ${st.keep}; cutoff ${fmt(cutoff)}`});
  }
- $("stageOutcome").innerHTML=(logs.length?'<h3>Filtering results</h3>':'')+
- (typeof logs[0]==="string"?`<p class="warn">${logs[0]}</p>`:logs.map((l,i)=>`<div class="notice"><b>Stage ${i+1} · ${l.label}</b><br>Cutoff: ${fmt(l.cutoff)} ${esc(data.unit)}. Survived: <b>${l.kept.map(x=>esc(x.name)).join(", ")||"None"}</b>. Eliminated: ${l.removed.map(x=>esc(x.name)).join(", ")||"None"}.</div>`).join(""))+
+ $("stageOutcome").innerHTML=(logs.length||errorMessage?'<h3>Filtering results</h3>':'')+
+ (errorMessage?`<p class="warn">${esc(errorMessage)} Filtering is incomplete; correct the input and run the stages again.</p>`:"")+
+ logs.map((l,i)=>`<div class="notice"><b>Stage ${i+1} · ${l.label}</b><br>Cutoff: ${fmt(l.cutoff)} ${esc(data.unit)}. Survived: <b>${l.kept.map(x=>esc(x.name)).join(", ")||"None"}</b>. Eliminated: ${l.removed.map(x=>esc(x.name)).join(", ")||"None"}.</div>`).join("")+
  `<h3>Flow diagram</h3><p class="hint">Solid sequence shows the alternatives that remain after each filter.</p><div class="flow">${cards.map((c,i)=>`${i?'<div class="arrow">→</div>':""}<div class="flow-card"><h3>${esc(c.title)}</h3><small class="muted">${esc(c.note)}</small><ul>${c.list.length?c.list.map(n=>`<li>${esc(n)}</li>`).join(""):"<li>None</li>"}</ul></div>`).join("")}</div>`+
- `<div class="notice success"><b>Final outcome:</b> ${survivors.length?survivors.map(x=>esc(x.name)).join(", "):"No alternatives remain. Review the stage rules."}</div>`;
+ `<div class="notice success"><b>${errorMessage?"Last completed stage — not a final outcome":"Final outcome"}:</b> ${survivors.length?survivors.map(x=>esc(x.name)).join(", "):"No alternatives remain. Review the stage rules."}</div>`;
 }
 function render(){
  renderTable();renderRegret();renderSummary();renderCriteria();renderStages();
@@ -182,7 +183,7 @@ function render(){
 $("scenario").onchange=e=>load(e.target.value);
 $("addAlt").onclick=()=>{data.alts.push({name:`Alternative ${String.fromCharCode(65+data.alts.length)}`,v:data.states.map(()=>0)});render()};
 $("addState").onclick=()=>{data.states.push({name:`State ${data.states.length+1}`,p:0});data.alts.forEach(a=>a.v.push(0));render()};
-$("transpose").onclick=()=>{transposed=!transposed;const old=data.alts;data.alts=data.states.map((s,j)=>({name:s.name,v:old.map(a=>a.v[j])}));data.states=old.map(a=>({name:a.name,p:100/old.length}));render()};
+$("transpose").onclick=()=>{if(!confirm("Transposing changes the decision model: the current alternatives become states of nature, and their probabilities are reset to equal percentages. Continue?"))return;const old=data.alts;data.alts=data.states.map((s,j)=>({name:s.name,v:old.map(a=>a.v[j])}));data.states=old.map(a=>({name:a.name,p:100/old.length}));render()};
 $("reset").onclick=()=>load(scenario);
 $("toggleRegret").onclick=()=>{showRegret=!showRegret;$("toggleRegret").textContent=showRegret?"Hide regret table":"Show regret table";renderRegret()};
 $("addStage").onclick=()=>{stages.push({criterion:"emv",keep:1});renderStages()};
