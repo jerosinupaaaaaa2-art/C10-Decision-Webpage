@@ -110,7 +110,7 @@ function tied(a,b){return Math.abs(a-b)<=TOL}
 function winners(items,key,mode="max"){const target=mode==="min"?Math.min(...items.map(x=>x[key])):Math.max(...items.map(x=>x[key]));return {target,items:items.filter(x=>tied(x[key],target))}}
 function renderTable(){
  const s=data.states;
- let head='<table><thead><tr><th>Alternative</th>'+s.map((st,j)=>`<th><input aria-label="State ${j+1} name" value="${esc(st.name)}" data-state-name="${j}" style="width:125px"><br><small>Probability %</small><br><input aria-label="Probability for ${esc(st.name)}" type="number" min="0" step="any" value="${st.p}" data-prob="${j}" style="width:78px"></th>`).join('')+'<th>Action</th></tr></thead><tbody>';
+let head='<table><thead><tr><th>Alternative</th>'+s.map((st,j)=>`<th><input aria-label="State ${j+1} name" value="${esc(st.name)}" data-state-name="${j}" style="width:125px"><br><small>Probability %</small><br><input aria-label="Probability for ${esc(st.name)}" type="number" min="0" step="any" value="${st.p}" data-prob="${j}" style="width:78px"><br><button class="danger" data-remove-state="${j}">Remove state</button></th>`).join('')+'<th>Action</th></tr></thead><tbody>';
  let body=data.alts.map((a,i)=>`<tr><td><input class="name" aria-label="Alternative name" value="${esc(a.name)}" data-alt-name="${i}"></td>${a.v.map((v,j)=>`<td><input type="number" step="any" value="${esc(v)}" data-pay="${i},${j}" aria-label="${esc(a.name)} payoff in ${esc(s[j].name)}"></td>`).join('')}<td><button class="danger" data-remove-alt="${i}" aria-label="Remove ${esc(a.name)}">Remove</button></td></tr>`).join('');
  $("payoffTable").innerHTML=head+body+'</tbody></table>';
  $("unit").value=data.unit;
@@ -123,7 +123,20 @@ function renderTable(){
  if(t.dataset.pay){let [i,j]=t.dataset.pay.split(",").map(Number);data.alts[i].v[j]=t.value===""?NaN:Number(t.value)}
  render();
  }));
- $("payoffTable").querySelectorAll("[data-remove-alt]").forEach(b=>b.onclick=()=>{if(data.alts.length<=1)return alert("Keep at least one alternative.");data.alts.splice(+b.dataset.removeAlt,1);render()});
+  $("payoffTable").querySelectorAll("[data-remove-alt]").forEach(b=>b.onclick=()=>{
+  if(data.alts.length<=1)return alert("Keep at least one alternative.");
+  data.alts.splice(+b.dataset.removeAlt,1);
+  render();
+});
+
+$("payoffTable").querySelectorAll("[data-remove-state]").forEach(b=>b.onclick=()=>{
+  if(data.states.length<=1)return alert("Keep at least one state of nature.");
+  const j=Number(b.dataset.removeState);
+  data.states.splice(j,1);
+  data.alts.forEach(a=>a.v.splice(j,1));
+  render();
+});
+}
 }
 function renderRegret(){
  if(!showRegret){$("regretWrap").classList.add("hidden");return}
