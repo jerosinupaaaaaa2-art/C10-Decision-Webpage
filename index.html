@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Lab | Grade 10 Criterion 10</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2e;--panel2:#17223b;--line:#293653;--text:#edf3ff;--muted:#aab8d2;--accent:#62e6c5;--blue:#82aaff;--gold:#ffd479;--red:#ff8291;--green:#8be0a2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0%,#1b2a4c 0,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{padding:34px max(20px,calc((100% - 1180px)/2)) 24px;border-bottom:1px solid var(--line)}
+.eyebrow{color:var(--accent);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.05;margin:10px 0 12px;letter-spacing:-.04em}
+header p{color:var(--muted);max-width:760px;margin:0}
+main{max-width:1180px;margin:26px auto;padding:0 18px 60px}
+.toolbar,.tabs,.actions,.inline{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.toolbar{margin:18px 0}
+button,select,input{font:inherit}button,.btn{border:1px solid var(--line);background:#1b2945;color:var(--text);padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:650}
+button:hover{border-color:var(--accent);transform:translateY(-1px)}button.primary{background:var(--accent);color:#08201c;border-color:var(--accent)}button.danger{color:#ffabb4}
+.tabs{border-bottom:1px solid var(--line);margin:20px 0}.tabs button{border:0;border-radius:9px 9px 0 0;background:transparent;color:var(--muted)}.tabs button.active{color:var(--accent);background:var(--panel);border-bottom:2px solid var(--accent)}
+.panel{background:linear-gradient(145deg,rgba(24,35,60,.97),rgba(16,24,43,.97));border:1px solid var(--line);border-radius:18px;padding:20px;margin:16px 0;box-shadow:0 12px 35px #0002}
+h2{font-size:1.25rem;margin:0 0 8px}h3{font-size:1rem;margin:0 0 8px}.muted,.hint{color:var(--muted)}.hint{font-size:.88rem}
+.pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 9px;color:var(--muted);font-size:.8rem}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:#0d162a;border:1px solid var(--line);padding:14px;border-radius:13px}.stat strong{display:block;font-size:1.45rem;color:var(--accent);overflow-wrap:anywhere}.stat span{color:var(--muted);font-size:.82rem}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:14px 0}table{border-collapse:collapse;width:100%;min-width:680px;background:#0d1628}th,td{padding:9px 10px;border-bottom:1px solid #26334d;text-align:center}th{background:#1a2944;color:#cbd8f0;font-size:.84rem}td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:#15223b;z-index:1}td input{width:90px;max-width:100%;background:#0a1222;color:var(--text);border:1px solid #354563;border-radius:7px;padding:7px;text-align:center}td .name{width:150px;text-align:left}td button{padding:5px 8px}
+input,select{background:#0a1222;color:var(--text);border:1px solid #354563;border-radius:8px;padding:8px}select{max-width:100%}
+.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric{background:#0d1628;border:1px solid var(--line);padding:13px;border-radius:12px}.metric .value{font-size:1.35rem;font-weight:800;color:var(--accent)}.metric small{color:var(--muted)}
+.best{color:var(--green);font-weight:800}.warn{color:var(--gold)}.error{color:var(--red)}.criterion-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.criterion{background:#0d1628;border:1px solid var(--line);border-radius:12px;padding:14px}
+.stage-row{display:grid;grid-template-columns:1.4fr 1fr auto auto;gap:9px;align-items:center;background:#0d1628;border:1px solid var(--line);padding:10px;border-radius:11px;margin:9px 0}
+.flow{display:flex;gap:10px;overflow-x:auto;padding:12px 2px}.flow-card{min-width:190px;max-width:240px;background:#0d1628;border:1px solid var(--line);border-radius:12px;padding:12px;flex:1}.flow-card h3{color:var(--accent)}.flow-card ul{padding-left:18px;margin:7px 0}.arrow{align-self:center;color:var(--blue);font-size:1.5rem}
+.notice{padding:10px 13px;border-radius:10px;background:#332b18;color:#ffe3a1;border:1px solid #67542b;margin:12px 0}.success{background:#102b29;color:#a8f2df;border-color:#28685d}
+.hidden{display:none!important}a{color:var(--accent)}footer{border-top:1px solid var(--line);padding:20px max(20px,calc((100% - 1180px)/2));color:var(--muted);font-size:.88rem}footer a{overflow-wrap:anywhere}
+@media(max-width:800px){.grid,.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.criterion-list{grid-template-columns:1fr}.stage-row{grid-template-columns:1fr 1fr}.stage-row button{justify-self:start}}
+@media(max-width:480px){header{padding-top:25px}.panel{padding:14px}.grid,.metric-grid{grid-template-columns:1fr 1fr}.stage-row{grid-template-columns:1fr}.toolbar button{flex:1}.tabs{overflow-x:auto;flex-wrap:nowrap}.tabs button{white-space:nowrap}}
+@media print{body{background:white;color:#111}.panel,.stat,.metric,.criterion,.flow-card{background:white;color:#111;box-shadow:none;border-color:#aaa}header,footer{color:#111}button,.toolbar,.tabs{display:none!important}th,td{color:#111;background:#eee!important}input{color:#111;background:white}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Grade 10 · Criterion 10 · Interactive decision model</div>
+  <h1>Decision Lab</h1>
+  <p>Compare alternatives under uncertainty. Edit the payoff table, test decision criteria, and follow a transparent staged-filtering process.</p>
+</header>
+<main>
+  <div class="toolbar">
+    <label class="hint" for="scenario">Load a sample problem</label>
+    <select id="scenario">
+      <option value="city">City logistics</option><option value="regional">Regional distributor</option><option value="blank">Blank / Custom</option>
+    </select>
+    <button id="transpose">Transpose table</button>
+    <button id="reset">Reset current sample</button>
+    <button class="primary" onclick="window.print()">Print / Save PDF</button>
+  </div>
+  <div class="tabs">
+    <button class="active" data-tab="table">1. Payoff Table</button><button data-tab="summary">2. Summary</button><button data-tab="criteria">3. Criterion Decisions</button><button data-tab="stages">4. Staged Filtering</button>
+  </div>
+  <section id="table" class="tab-content">
+    <div class="panel">
+      <h2>1. Payoff Table</h2>
+      <p class="hint">Enter payoffs in the same unit (for example, thousands of dollars). State probabilities are percentages and must total 100% for EMV / Bayes.</p>
+      <div class="inline"><label class="hint">Payoff unit <input id="unit" value="thousand USD" style="width:150px"></label><span id="probStatus" class="pill"></span></div>
+      <div id="payoffTable" class="table-wrap"></div>
+      <div class="actions"><button class="primary" id="addAlt">＋ Add alternative</button><button id="addState">＋ Add state of nature</button><button id="toggleRegret">Show regret table</button></div>
+      <div id="regretWrap" class="hidden"></div>
+    </div>
+    <div class="panel"><h2>How the statistics are calculated</h2>
+      <p class="hint"><b>Max payoff:</b> the largest payoff for an alternative. <b>Min payoff:</b> its smallest payoff. <b>EMV:</b> each payoff multiplied by its state's probability, then added.</p>
+      <p class="hint"><b>Regret:</b> the best payoff among all original alternatives in a state minus that alternative's payoff. <b>Maximum regret:</b> the largest state regret. Regret benchmarks stay fixed during staged filtering.</p>
+      <p class="hint">All calculations use full precision. Displayed values are rounded to two decimals. Values within 10⁻⁹ are treated as ties.</p>
+    </div>
+  </section>
+  <section id="summary" class="tab-content hidden">
+    <div class="panel"><h2>2. Summary</h2><p class="hint">A quick comparison of each alternative's performance across states of nature.</p><div id="summaryStats" class="grid"></div></div>
+  </section>
+  <section id="criteria" class="tab-content hidden">
+    <div class="panel"><h2>3. Criterion Decisions</h2><p class="hint">Each criterion compares the complete original set. Different criteria may recommend different alternatives.</p><div id="criterionResults" class="criterion-list"></div></div>
+  </section>
+  <section id="stages" class="tab-content hidden">
+    <div class="panel"><h2>4. Staged Filtering</h2>
+      <p class="hint">Apply rules in order. Each stage evaluates only the alternatives that survived the previous stage. Choose a criterion and how many top-ranked alternatives to keep. Ties at the cutoff all survive, in their original order. Eliminated alternatives never re-enter.</p>
+      <div id="stageControls"></div>
+      <div class="actions"><button class="primary" id="addStage">＋ Add stage</button><button id="restoreStages">Restore default stages</button></div>
+      <div id="stageOutcome"></div>
+    </div>
+  </section>
+  <div class="panel"><h2>About this model</h2><p class="hint">This is an educational decision-support model. Maximax is optimistic, Maximin is cautious, Minimax Regret reduces the worst missed opportunity, and EMV / Bayes uses probability-weighted payoffs. No single criterion is automatically correct for every decision; the decision-maker should explain which assumptions fit the situation.</p></div>
+</main>
+<footer>
+  <b>AI Development Record:</b> <a href="https://chatgpt.com/share/6aed2d4b-8cbc-83e9-bee3-2f90f96bcddf" target="_blank" rel="noopener noreferrer">Open the AI conversation used to develop this webpage</a>
+  <div>Grade 10 · Criterion 10 · Decision Lab</div>
+</footer>
+<script>
+const TOL=1e-9;
+const samples={
+ city:{unit:"thousand USD",states:[{name:"High demand",p:30},{name:"Medium demand",p:45},{name:"Low demand",p:25}],alts:[{name:"Expand warehouse",v:[180,90,-40]},{name:"Lease extra space",v:[130,85,20]},{name:"Use current facility",v:[75,65,45]},{name:"Outsource logistics",v:[110,70,35]}]},
+ regional:{unit:"thousand USD",states:[{name:"Strong market",p:25},{name:"Stable market",p:50},{name:"Weak market",p:25}],alts:[{name:"Build new hub",v:[240,100,-100]},{name:"Partner locally",v:[160,110,35]},{name:"Upgrade current site",v:[125,95,55]},{name:"Delay investment",v:[70,65,60]}]}
+};
+let data,scenario="city",transposed=false,showRegret=false,stages=[];
+const $=id=>document.getElementById(id);
+const fmt=n=>Number.isFinite(n)?n.toFixed(2):"—";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function defaults(){return [{criterion:"maximin",keep:2},{criterion:"regret",keep:1},{criterion:"emv",keep:1}]}
+function load(key){scenario=key;data=key==="blank"?{unit:"units",states:[{name:"State 1",p:50},{name:"State 2",p:50}],alts:[{name:"Alternative A",v:[10,5]},{name:"Alternative B",v:[7,8]}]}:JSON.parse(JSON.stringify(samples[key]));stages=defaults();transposed=false;showRegret=false;$("scenario").value=key;render()}
+function stats(){
+ const total=data.states.reduce((s,x)=>s+(Number(x.p)||0),0), validProb=data.states.every(x=>Number.isFinite(Number(x.p))&&Number(x.p)>=0)&&Math.abs(total-100)<1e-7;
+ const vals=data.alts.map(a=>a.v.map(Number));
+ const bestByState=data.states.map((_,j)=>Math.max(...vals.map(row=>row[j])));
+ return data.alts.map((a,i)=>{const row=vals[i],max=Math.max(...row),min=Math.min(...row),emv=validProb?row.reduce((s,v,j)=>s+v*Number(data.states[j].p)/100,0):NaN,regrets=row.map((v,j)=>bestByState[j]-v),maxRegret=Math.max(...regrets);return {name:a.name,max,min,emv,regrets,maxRegret,index:i}});
+}
+function tied(a,b){return Math.abs(a-b)<=TOL}
+function winners(items,key,mode="max"){const target=mode==="min"?Math.min(...items.map(x=>x[key])):Math.max(...items.map(x=>x[key]));return {target,items:items.filter(x=>tied(x[key],target))}}
+function renderTable(){
+ const s=data.states;
+ let head='<table><thead><tr><th>Alternative</th>'+s.map((st,j)=>`<th><input aria-label="State ${j+1} name" value="${esc(st.name)}" data-state-name="${j}" style="width:125px"><br><small>Probability %</small><br><input aria-label="Probability for ${esc(st.name)}" type="number" min="0" step="any" value="${st.p}" data-prob="${j}" style="width:78px"></th>`).join('')+'<th>Action</th></tr></thead><tbody>';
+ let body=data.alts.map((a,i)=>`<tr><td><input class="name" aria-label="Alternative name" value="${esc(a.name)}" data-alt-name="${i}"></td>${a.v.map((v,j)=>`<td><input type="number" step="any" value="${esc(v)}" data-pay="${i},${j}" aria-label="${esc(a.name)} payoff in ${esc(s[j].name)}"></td>`).join('')}<td><button class="danger" data-remove-alt="${i}" aria-label="Remove ${esc(a.name)}">Remove</button></td></tr>`).join('');
+ $("payoffTable").innerHTML=head+body+'</tbody></table>';
+ $("unit").value=data.unit;
+ $("probStatus").textContent=`Probability total: ${fmt(s.reduce((x,y)=>x+Number(y.p||0),0))}%`;
+ $("probStatus").className="pill "+(Math.abs(s.reduce((x,y)=>x+Number(y.p||0),0)-100)<1e-7?"success":"warn");
+ $("payoffTable").querySelectorAll("input").forEach(inp=>inp.addEventListener("change",e=>{
+ const t=e.target;if(t.dataset.stateName!==undefined)data.states[+t.dataset.stateName].name=t.value;
+ if(t.dataset.prob!==undefined)data.states[+t.dataset.prob].p=t.value===""?NaN:Number(t.value);
+ if(t.dataset.altName!==undefined)data.alts[+t.dataset.altName].name=t.value;
+ if(t.dataset.pay){let [i,j]=t.dataset.pay.split(",").map(Number);data.alts[i].v[j]=t.value===""?NaN:Number(t.value)}
+ render();
+ }));
+ $("payoffTable").querySelectorAll("[data-remove-alt]").forEach(b=>b.onclick=()=>{if(data.alts.length<=1)return alert("Keep at least one alternative.");data.alts.splice(+b.dataset.removeAlt,1);render()});
+}
+function renderRegret(){
+ if(!showRegret){$("regretWrap").classList.add("hidden");return}
+ const all=stats();$("regretWrap").classList.remove("hidden");
+ $("regretWrap").innerHTML='<h3>Regret table</h3><div class="table-wrap"><table><thead><tr><th>Alternative</th>'+data.states.map(s=>`<th>${esc(s.name)}</th>`).join('')+'<th>Maximum regret</th></tr></thead><tbody>'+all.map(x=>`<tr><td>${esc(x.name)}</td>${x.regrets.map(v=>`<td>${fmt(v)}</td>`).join('')}<td><b>${fmt(x.maxRegret)}</b></td></tr>`).join('')+'</tbody></table></div>';
+}
+function renderSummary(){
+ const all=stats();$("summaryStats").innerHTML=all.map(x=>`<div class="stat"><span>${esc(x.name)}</span><strong>${fmt(x.emv)}</strong><span>EMV · ${esc(data.unit)}</span><div class="hint">Max ${fmt(x.max)} · Min ${fmt(x.min)} · Max regret ${fmt(x.maxRegret)}</div></div>`).join('');
+}
+function renderCriteria(){
+ const all=stats(),valid=data.states.every(x=>Number.isFinite(Number(x.p))&&Number(x.p)>=0)&&Math.abs(data.states.reduce((s,x)=>s+Number(x.p),0)-100)<1e-7;
+ const payoffsValid=data.alts.every(a=>a.v.every(v=>Number.isFinite(Number(v))));
+ const defs=[["Maximax","max","max"],["Maximin","min","min"],["Minimax Regret","maxRegret","min"],["EMV / Bayes","emv","max"]];
+ $("criterionResults").innerHTML=defs.map(([label,key,mode])=>{if(!payoffsValid)return `<div class="criterion"><h3>${label}</h3><p class="warn">Enter a valid numeric payoff in every cell.</p></div>`;if(key==="emv"&&!valid)return `<div class="criterion"><h3>${label}</h3><p class="warn">Set non-negative probabilities that total exactly 100% to calculate EMV.</p></div>`;const w=winners(all,key,mode);return `<div class="criterion"><h3>${label}</h3><div class="value">${fmt(w.target)} <small>${esc(data.unit)}</small></div><p class="hint">Recommended ${w.items.length>1?"alternatives":"alternative"}:</p><b class="best">${w.items.map(x=>esc(x.name)).join(", ")}</b></div>`}).join('');
+}
+const criteria={maximax:{label:"Maximax",key:"max",mode:"max"},maximin:{label:"Maximin",key:"min",mode:"max"},regret:{label:"Minimax Regret",key:"maxRegret",mode:"min"},emv:{label:"EMV / Bayes",key:"emv",mode:"max"}};
+function renderStages(){
+ const all=stats();
+ $("stageControls").innerHTML=stages.map((st,i)=>`<div class="stage-row"><label class="hint">Stage ${i+1}<br><select data-stage-criterion="${i}">${Object.entries(criteria).map(([k,c])=>`<option value="${k}" ${st.criterion===k?"selected":""}>${c.label}</option>`).join("")}</select></label><label class="hint">Keep top N<br><input type="number" min="1" max="${data.alts.length}" value="${st.keep}" data-stage-keep="${i}" style="width:90px"></label><span class="pill">${criteria[st.criterion].mode==="min"?"Lowest first":"Highest first"}</span><button class="danger" data-remove-stage="${i}">Remove stage</button></div>`).join("");
+ $("stageControls").querySelectorAll("[data-stage-criterion]").forEach(el=>el.onchange=()=>{stages[+el.dataset.stageCriterion].criterion=el.value;renderStages()});
+ $("stageControls").querySelectorAll("[data-stage-keep]").forEach(el=>el.onchange=()=>{stages[+el.dataset.stageKeep].keep=Math.max(1,Math.min(data.alts.length,parseInt(el.value)||1));renderStages()});
+ $("stageControls").querySelectorAll("[data-remove-stage]").forEach(el=>el.onclick=()=>{stages.splice(+el.dataset.removeStage,1);renderStages()});
+ let survivors=all.slice(),cards=[{title:"Starting alternatives",list:survivors.map(x=>x.name),note:"Complete original set"}],logs=[];
+ for(let i=0;i<stages.length;i++){
+  const st=stages[i],c=criteria[st.criterion];
+  if(!data.alts.every(a=>a.v.every(v=>Number.isFinite(Number(v))))){logs.push("Enter a valid numeric payoff in every cell before applying filters.");break}
+  if(st.criterion==="emv"&&!(data.states.every(x=>Number.isFinite(Number(x.p))&&Number(x.p)>=0)&&Math.abs(data.states.reduce((s,x)=>s+Number(x.p),0)-100)<1e-7)){logs.push("EMV stage needs non-negative probabilities totalling 100%.");break}
+  if(!survivors.length){logs.push("No alternatives remain to evaluate.");break}
+  const sorted=survivors.slice().sort((a,b)=>c.mode==="min"?a[c.key]-b[c.key]:b[c.key]-a[c.key]);
+  const cutoffIndex=Math.min(Math.max(1,Number(st.keep)||1),sorted.length)-1,cutoff=sorted[cutoffIndex][c.key];
+  const kept=survivors.filter(x=>c.mode==="min"?x[c.key]<=cutoff+TOL:x[c.key]>=cutoff-TOL);
+  const removed=survivors.filter(x=>!kept.includes(x));
+  logs.push({label:c.label,cutoff,kept,removed,before:survivors.slice()});
+  survivors=kept;cards.push({title:`After stage ${i+1}: ${c.label}`,list:survivors.map(x=>x.name),note:`Kept top ${st.keep}; cutoff ${fmt(cutoff)}`});
+ }
+ $("stageOutcome").innerHTML=(logs.length?'<h3>Filtering results</h3>':'')+
+ (typeof logs[0]==="string"?`<p class="warn">${logs[0]}</p>`:logs.map((l,i)=>`<div class="notice"><b>Stage ${i+1} · ${l.label}</b><br>Cutoff: ${fmt(l.cutoff)} ${esc(data.unit)}. Survived: <b>${l.kept.map(x=>esc(x.name)).join(", ")||"None"}</b>. Eliminated: ${l.removed.map(x=>esc(x.name)).join(", ")||"None"}.</div>`).join(""))+
+ `<h3>Flow diagram</h3><p class="hint">Solid sequence shows the alternatives that remain after each filter.</p><div class="flow">${cards.map((c,i)=>`${i?'<div class="arrow">→</div>':""}<div class="flow-card"><h3>${esc(c.title)}</h3><small class="muted">${esc(c.note)}</small><ul>${c.list.length?c.list.map(n=>`<li>${esc(n)}</li>`).join(""):"<li>None</li>"}</ul></div>`).join("")}</div>`+
+ `<div class="notice success"><b>Final outcome:</b> ${survivors.length?survivors.map(x=>esc(x.name)).join(", "):"No alternatives remain. Review the stage rules."}</div>`;
+}
+function render(){
+ renderTable();renderRegret();renderSummary();renderCriteria();renderStages();
+}
+$("scenario").onchange=e=>load(e.target.value);
+$("addAlt").onclick=()=>{data.alts.push({name:`Alternative ${String.fromCharCode(65+data.alts.length)}`,v:data.states.map(()=>0)});render()};
+$("addState").onclick=()=>{data.states.push({name:`State ${data.states.length+1}`,p:0});data.alts.forEach(a=>a.v.push(0));render()};
+$("transpose").onclick=()=>{transposed=!transposed;const old=data.alts;data.alts=data.states.map((s,j)=>({name:s.name,v:old.map(a=>a.v[j])}));data.states=old.map(a=>({name:a.name,p:100/old.length}));render()};
+$("reset").onclick=()=>load(scenario);
+$("toggleRegret").onclick=()=>{showRegret=!showRegret;$("toggleRegret").textContent=showRegret?"Hide regret table":"Show regret table";renderRegret()};
+$("addStage").onclick=()=>{stages.push({criterion:"emv",keep:1});renderStages()};
+$("restoreStages").onclick=()=>{stages=defaults();renderStages()};
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".tab-content").forEach(x=>x.classList.toggle("hidden",x.id!==b.dataset.tab))});
+load("city");
+</script>
+</body>
+</html>
